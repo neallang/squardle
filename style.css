@@ -1,0 +1,64 @@
+.body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;    
+    height: 100vh;
+}
+
+.container {
+    text-align: center;
+}
+
+table {
+    margin: 0px auto;
+}
+
+td {
+    width: 75px;
+    height: 75px;
+    border-radius: 5px;
+    border: 1px solid black;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 20px;
+    background-color: white;
+}
+
+/* use # to grab from id rather than class */
+#guess-row td {
+    background-color: #85d3e9;
+}
+
+.last-cell {
+    background-color: #dddb78;
+}
+
+#keyboard {
+    margin: 20px auto;
+}
+
+.keyboard-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.key {
+    width: 50px;
+    height: 60px;
+    margin: 2px;
+    font-size: 18px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    background-color: #fff;
+    text-align: center;
+    vertical-align: middle;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.key.special-key {
+    width: 90px;
+}
