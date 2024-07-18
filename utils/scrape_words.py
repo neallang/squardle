@@ -14,9 +14,13 @@ try:
     word_elements = soup.select('li.invert.light a')
 
     # Extract the words from the elements
-    wordle_words = [element.get_text() for element in word_elements]
+    wordle_words = [element.get_text().upper() for element in word_elements]
 
     with open('words.txt', 'w') as file:
         for word in wordle_words:
             file.write(word + '\n')
 
+except requests.RequestException as e:
+    print(f"Error fetching the webpage: {e}")
+except Exception as e:
+    print(f"An error occurred: {e}")
