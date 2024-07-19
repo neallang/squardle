@@ -91,21 +91,21 @@ function submitGuess() {
 }
 
 function revealRow(row, rowIndex, guess) {
-    setTimeout(() => {
-        row.style.transform = 'scale(1.1)';
-        for (let colIndex = 0; colIndex < 5; colIndex++) {
-            const cell = row.cells[colIndex];
-            // Green condition
-            console.log(`Cell data-letter: ${cell.getAttribute('data-letter')}, Guess: ${currentGuess[colIndex]}`);
+    for (let colIndex = 0; colIndex < 5; colIndex++) {
+        const cell = row.cells[colIndex];
+        
+        // Green condition
+        setTimeout(() => {
             if (guess[colIndex] === cell.getAttribute('data-letter')) {
                 cell.textContent = guess[colIndex];
                 cell.style.backgroundColor = 'green';
             }
-        }
-        setTimeout(() => {
-            row.style.transform = 'scale(1)';
-        }, 200);
-    }, rowIndex * 200);
+            cell.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                cell.style.transform = 'scale(1)';
+            }, 200);
+        }, colIndex * 200);
+    }
 }
 
 
