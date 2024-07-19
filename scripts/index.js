@@ -84,15 +84,30 @@ function submitGuess() {
     const table = document.getElementById("game-table")
         for (let rowIndex = 1; rowIndex <= 5; rowIndex++) {
             const row = table.rows[rowIndex];
-            const word = row.cells;
-            for (let colIndex = 0; colIndex < 5; colIndex++) {
-                if (currentGuess[colIndex] === word[colIndex].getAttribute('data-letter')) {
-                    word[colIndex].textContent = currentGuess[colIndex];     // Show the letter if in the right position
-                }
-            }
+
+            revealRow(row, rowIndex, currentGuess);
         }
         currentGuess = "";
 }
+
+function revealRow(row, rowIndex, guess) {
+    setTimeout(() => {
+        row.style.transform = 'scale(1.1)';
+        for (let colIndex = 0; colIndex < 5; colIndex++) {
+            const cell = row.cells[colIndex];
+            // Green condition
+            console.log(`Cell data-letter: ${cell.getAttribute('data-letter')}, Guess: ${currentGuess[colIndex]}`);
+            if (guess[colIndex] === cell.getAttribute('data-letter')) {
+                cell.textContent = guess[colIndex];
+                cell.style.backgroundColor = 'green';
+            }
+        }
+        setTimeout(() => {
+            row.style.transform = 'scale(1)';
+        }, 200);
+    }, rowIndex * 200);
+}
+
 
 // UI keyboard
 document.querySelectorAll('.key').forEach(button => {
