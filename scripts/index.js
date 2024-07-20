@@ -1,7 +1,8 @@
 let currentGuess = ''; 
 let guessesRemaining = 15;
 let validWords = [];
-let yellowArrays = [[], [], [], [], []] // Yellow letters for each word
+let yellowArrays = [[], [], [], [], []]; // Yellow letters for each word
+let letterMaps = []; // Global array to store letter maps for each word
 
 function getWords(callback) {
     fetch('utils/words.txt')
@@ -37,11 +38,14 @@ function populateTable(words) {
     const table = document.getElementById('game-table');
     words.forEach((word, rowIndex) => {
         const row = table.rows[rowIndex + 1];  // Start from the second row (idx 1)
+        let letterMap = {};  // Initialize letter map for this word
         word.split('').forEach((letter, colIndex) => {
             const cell = row.cells[colIndex];
             cell.setAttribute('data-letter', letter);  // Store the letter in a data attribute
             cell.textContent = '';  // Hide the letter until they guess it
+            letterMap[letter] = (letterMap[letter] || 0) + 1;  // Count the letters in the word
         });
+        letterMaps[rowIndex] = letterMap;  // Store the letter map for this row
     });
 }
 
@@ -67,7 +71,6 @@ function handleKeyInput(letter) {
 function submitGuess() {
     const errorMessage = document.getElementById("error-message");
     if (!validWords.includes(currentGuess)) {
-        const errorMessage = document.getElementById("error-message");
         errorMessage.textContent = 'Not a valid word';
         return;
     }
@@ -83,74 +86,58 @@ function submitGuess() {
     }
 
     // Reveal green letters
-    const table = document.getElementById("game-table")
-        for (let rowIndex = 1; rowIndex < 6; rowIndex++) {
-            const row = table.rows[rowIndex];
+    const table = document.getElementById("game-table");
+    for (let rowIndex = 1; rowIndex < 6; rowIndex++) {
+        const row = table.rows[rowIndex];
 
-            console.log(`Revealing row ${rowIndex}`);
-            revealRow(row, rowIndex - 1, currentGuess);
-        }
-        currentGuess = "";
+        console.log(`Revealing row ${rowIndex}`);
+        revealRow(row, rowIndex - 1, currentGuess);
+    }
+    currentGuess = "";
 }
 
 function revealRow(row, rowIndex, guess) {
-    console.log(`Starting to reveal row ${rowIndex}`);  // Debugging statement
     const yellowLetters = yellowArrays[rowIndex];  // Use the persistent array for the row
-    const letterMap = {};  // To keep track of the letters and their counts in the word
+    let letterMap = letterMaps[rowIndex];  // Get the letter map for this word
 
-    // First pass: Handle green letters and count the letters in the word
-    for (let colIndex = 0; colIndex < 5; colIndex++) {  // Iterate through the first 5 columns
+    console.log(`Initial Letter Map for Row ${rowIndex}:`, JSON.parse(JSON.stringify(letterMap)));
+
+    // First pass: Handle green letters and decrement letterMap
+    for (let colIndex = 0; colIndex < 5; colIndex++) {
         const cell = row.cells[colIndex];
         const letter = cell.getAttribute('data-letter');
+        const guessLetter = guess[colIndex];
 
-        // Count letters in the word
-        if (letterMap[letter]) {
-            letterMap[letter]++;
-        } else {
-            letterMap[letter] = 1;
-        }
-
-        setTimeout(() => {
-            if (guess[colIndex] === letter) {
-                cell.textContent = guess[colIndex];
-                cell.style.backgroundColor = 'green';
-                letterMap[letter]--;
-                // Remove the letter from yellow letters if it's correctly guessed
-                const yellowIndex = yellowLetters.indexOf(guess[colIndex]);
-                if (yellowIndex > -1) {
-                    yellowLetters.splice(yellowIndex, 1);
-                }
+        if (guessLetter === letter) {
+            cell.textContent = guessLetter;
+            cell.style.backgroundColor = 'green';
+            letterMap[letter]--;
+            console.log(`Green Letter: ${guessLetter} at index ${colIndex}, decremented letterMap:`, JSON.parse(JSON.stringify(letterMap)));
+            // Remove the letter from yellow letters if it's correctly guessed
+            const yellowIndex = yellowLetters.indexOf(guessLetter);
+            if (yellowIndex > -1) {
+                yellowLetters.splice(yellowIndex, 1);
             }
-            cell.style.transform = 'scale(1.2)';
-            setTimeout(() => {
-                cell.style.transform = 'scale(1)';
-            }, 200);
-        }, colIndex * 200);
+        }
     }
 
-    console.log(`Letter Map for Row ${rowIndex}:`, letterMap);
-
     // Second pass: Handle yellow letters
-    setTimeout(() => {
-        for (let colIndex = 0; colIndex < 5; colIndex++) {
-            const cell = row.cells[colIndex];
-            const letter = cell.getAttribute('data-letter');
-            const guessLetter = guess[colIndex];
+    for (let colIndex = 0; colIndex < 5; colIndex++) {
+        const cell = row.cells[colIndex];
+        const guessLetter = guess[colIndex];
+        const letter = cell.getAttribute('data-letter');
 
-            // Skip already processed green letters
-            if (guessLetter !== letter && letterMap[guessLetter] > 0) {
-                if (!yellowLetters.includes(guessLetter)) {
-                    yellowLetters.push(guessLetter);
-                }
-                letterMap[guessLetter]--;
-            }
+        if (guessLetter !== letter && letterMap[guessLetter] > 0 && !yellowLetters.includes(guessLetter)) {
+            yellowLetters.push(guessLetter);
+            letterMap[guessLetter]--;
+            console.log(`Yellow Letter: ${guessLetter} at index ${colIndex}, decremented letterMap:`, JSON.parse(JSON.stringify(letterMap)));
         }
+    }
 
-        console.log(`Yellow Letters for Row ${rowIndex}:`, yellowLetters);
+    console.log(`Final Letter Map for Row ${rowIndex}:`, JSON.parse(JSON.stringify(letterMap)));
 
-        const yellowCell = row.cells[5];  // The last cell for yellow letters
-        yellowCell.textContent = yellowLetters.join('');
-    }, 1100);  // Delay to show yellow letters after the trickling effect
+    const yellowCell = row.cells[5];  // The last cell for yellow letters
+    yellowCell.textContent = yellowLetters.join('');
 }
 
 // UI keyboard
@@ -158,8 +145,8 @@ document.querySelectorAll('.key').forEach(button => {
     button.addEventListener('click', () => {
         const letter = button.textContent;
         handleKeyInput(letter);
-    })
-})
+    });
+});
 
 // Physical keyboard
 document.addEventListener('keydown', (event) => {
@@ -167,13 +154,12 @@ document.addEventListener('keydown', (event) => {
 
     if (key === "BACKSPACE") {
         handleKeyInput("DEL");
-    } 
-    else if (key === "ENTER") {
+    } else if (key === "ENTER") {
         handleKeyInput("ENTER");
-    } 
-    else if (key >= 'A' && key <= 'Z') {
+    } else if (key >= 'A' && key <= 'Z') {
         handleKeyInput(key);
     }
-})
+});
 
+// Initialize
 getWords(dailyWords);
