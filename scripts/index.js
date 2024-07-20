@@ -84,29 +84,36 @@ function submitGuess() {
 
     // Reveal green letters
     const table = document.getElementById("game-table")
-        for (let rowIndex = 1; rowIndex <= 5; rowIndex++) {
+        for (let rowIndex = 1; rowIndex < 6; rowIndex++) {
             const row = table.rows[rowIndex];
 
-            revealRow(row, rowIndex, currentGuess);
+            console.log(`Revealing row ${rowIndex}`);
+            revealRow(row, rowIndex - 1, currentGuess);
         }
         currentGuess = "";
 }
 
 function revealRow(row, rowIndex, guess) {
-    const yellowLetters = yellowArrays[rowIndex]
+    const yellowLetters = yellowArrays[rowIndex];  // Use the persistent array for the row
+    const letterMap = {};  // To keep track of the letters and their counts in the word
+
+    // First pass: Handle green letters and count the letters in the word
     for (let colIndex = 0; colIndex < 6; colIndex++) {
         const cell = row.cells[colIndex];
-        
+        const letter = cell.getAttribute('data-letter');
+
+        // Count letters in the word
+        if (letterMap[letter]) {
+            letterMap[letter]++;
+        } else {
+            letterMap[letter] = 1;
+        }
+
         setTimeout(() => {
-            // Green condition
-            if (guess[colIndex] === cell.getAttribute('data-letter')) {
+            if (guess[colIndex] === letter) {
                 cell.textContent = guess[colIndex];
                 cell.style.backgroundColor = 'green';
-            }
-            // Yellow condition
-            else if (yellowCase(cell, guess[colIndex], row, guess)) {
-                if (!yellowLetters.includes(guess[colIndex]))
-                yellowLetters.push(guess[colIndex])
+                letterMap[letter]--;
             }
             cell.style.transform = 'scale(1.2)';
             setTimeout(() => {
@@ -114,35 +121,55 @@ function revealRow(row, rowIndex, guess) {
             }, 200);
         }, colIndex * 200);
     }
+
+    console.log(letterMap)
+
+    // Second pass: Handle yellow letters
     setTimeout(() => {
-        const yellowCell = row.cells[5];
+        for (let colIndex = 0; colIndex < 5; colIndex++) {
+            const cell = row.cells[colIndex];
+            const letter = cell.getAttribute('data-letter');
+            const guessLetter = guess[colIndex];
+
+            // Skip already processed green letters
+            if (guess[colIndex] !== letter && letterMap[guessLetter] > 0) {
+                if (!yellowLetters.includes(guessLetter)) {
+                    yellowLetters.push(guessLetter);
+                }
+                letterMap[guessLetter]--;
+            }
+        }
+
+
+
+        const yellowCell = row.cells[5];  // The last cell for yellow letters
         yellowCell.textContent = yellowLetters.join('');
-    }, 1100);
+    }, 1100);  // Delay to show yellow letters after the trickling effect
 }
 
-function yellowCase(cell, letter, row, guess) {
-    let letterCountInWord = 0;
-    let letterCountInGuess = 0;
-    // Count occurrences of letter in word and guess
-    for (let i = 0; i < 5; i++) {
-        if (row.cells[i].getAttribute('data-letter') === letter) {
-            letterCountInWord++;
-        }
-            if (guess[i] === letter) {
-                letterCountInGuess++;    
-        }
-    }
-    let correctPositionCount = 0;
+// function yellowCase(cell, letter, row, guess) {
+//     let letterCountInWord = 0;
+//     let letterCountInGuess = 0;
+//     // Count occurrences of letter in word and guess
+//     for (let i = 0; i < 5; i++) {
+//         if (row.cells[i].getAttribute('data-letter') === letter) {
+//             letterCountInWord++;
+//         }
+//             if (guess[i] === letter) {
+//                 letterCountInGuess++;    
+//         }
+//     }
+//     let correctPositionCount = 0;
 
-    // Count occurrences of letter in correct position
-    for (let i = 0; i < 5; i++) {
-        if (guess[i] === row.cells[i].getAttribute('data-letter') && guess[i] === letter) {
-            correctPositionCount++;
-        }
-    }
+//     // Count occurrences of letter in correct position
+//     for (let i = 0; i < 5; i++) {
+//         if (guess[i] === row.cells[i].getAttribute('data-letter') && guess[i] === letter) {
+//             correctPositionCount++;
+//         }
+//     }
 
-    return letterCountInWord > correctPositionCount;
-}
+//     return letterCountInWord > correctPositionCount;
+// }
 
 
 // UI keyboard
