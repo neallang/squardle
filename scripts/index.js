@@ -1,8 +1,8 @@
 let currentGuess = ''; 
 let guessesRemaining = 15;
 let validWords = [];
-let yellowArrays = [[], [], [], [], []]; // Yellow letters for each word
-let letterMaps = []; // Global array to store letter maps for each word
+let yellowArrays = [[], [], [], [], []];    // Yellow letters for each word
+let letterMaps = [];                        // Letter count for each word
 
 function getWords(callback) {
     fetch('utils/words.txt')
@@ -38,11 +38,11 @@ function populateTable(words) {
     const table = document.getElementById('game-table');
     words.forEach((word, rowIndex) => {
         const row = table.rows[rowIndex + 1];  // Start from the second row (idx 1)
-        let letterMap = {};  // Initialize letter map for this word
+        let letterMap = {};                    // Initialize letter map for each word
         word.split('').forEach((letter, colIndex) => {
             const cell = row.cells[colIndex];
             cell.setAttribute('data-letter', letter);  // Store the letter in a data attribute
-            cell.textContent = '';  // Hide the letter until they guess it
+            cell.textContent = '';                     // Hide the letter until they guess it
             letterMap[letter] = (letterMap[letter] || 0) + 1;  // Count the letters in the word
         });
         letterMaps[rowIndex] = letterMap;  // Store the letter map for this row
@@ -70,6 +70,8 @@ function handleKeyInput(letter) {
 
 function submitGuess() {
     const errorMessage = document.getElementById("error-message");
+
+    // Invalid word
     if (!validWords.includes(currentGuess)) {
         errorMessage.textContent = 'Not a valid word';
         return;
@@ -85,7 +87,7 @@ function submitGuess() {
         firstRow.cells[i].textContent = '';
     }
 
-    // Reveal green letters
+    // Reveal green / yellow letters
     const table = document.getElementById("game-table");
     for (let rowIndex = 1; rowIndex < 6; rowIndex++) {
         const row = table.rows[rowIndex];
@@ -97,12 +99,10 @@ function submitGuess() {
 }
 
 function revealRow(row, rowIndex, guess) {
-    const yellowLetters = yellowArrays[rowIndex];  // Use the persistent array for the row
-    let letterMap = letterMaps[rowIndex];  // Get the letter map for this word
+    const yellowLetters = yellowArrays[rowIndex];  // Use the array for the word
+    let letterMap = letterMaps[rowIndex];          // Get the letter map for the word
 
-    console.log(`Initial Letter Map for Row ${rowIndex}:`, JSON.parse(JSON.stringify(letterMap)));
-
-    // First pass: Handle green letters and decrement letterMap
+    // First pass: Handle green letters
     for (let colIndex = 0; colIndex < 5; colIndex++) {
         const cell = row.cells[colIndex];
         const letter = cell.getAttribute('data-letter');
@@ -111,8 +111,8 @@ function revealRow(row, rowIndex, guess) {
         if (guessLetter === letter) {
             cell.textContent = guessLetter;
             cell.style.backgroundColor = 'green';
-            letterMap[letter]--;
-            console.log(`Green Letter: ${guessLetter} at index ${colIndex}, decremented letterMap:`, JSON.parse(JSON.stringify(letterMap)));
+            letterMap[letter]--;                   
+
             // Remove the letter from yellow letters if it's correctly guessed
             const yellowIndex = yellowLetters.indexOf(guessLetter);
             if (yellowIndex > -1) {
@@ -130,13 +130,10 @@ function revealRow(row, rowIndex, guess) {
         if (guessLetter !== letter && letterMap[guessLetter] > 0 && !yellowLetters.includes(guessLetter)) {
             yellowLetters.push(guessLetter);
             letterMap[guessLetter]--;
-            console.log(`Yellow Letter: ${guessLetter} at index ${colIndex}, decremented letterMap:`, JSON.parse(JSON.stringify(letterMap)));
         }
     }
 
-    console.log(`Final Letter Map for Row ${rowIndex}:`, JSON.parse(JSON.stringify(letterMap)));
-
-    const yellowCell = row.cells[5];  // The last cell for yellow letters
+    const yellowCell = row.cells[5];                // The last cell for yellow letters
     yellowCell.textContent = yellowLetters.join('');
 }
 
