@@ -1,6 +1,7 @@
 let currentGuess = ''; 
 let guessesRemaining = 15;
 let validWords = [];
+let yellowArrays = [[], [], [], [], []] // Yellow letters for each word
 
 function getWords(callback) {
     fetch('utils/words.txt')
@@ -92,8 +93,8 @@ function submitGuess() {
 }
 
 function revealRow(row, rowIndex, guess) {
-    const yellowLetters = [];  // For each row
-    for (let colIndex = 0; colIndex < 5; colIndex++) {
+    const yellowLetters = yellowArrays[rowIndex]
+    for (let colIndex = 0; colIndex < 6; colIndex++) {
         const cell = row.cells[colIndex];
         
         setTimeout(() => {
@@ -103,7 +104,8 @@ function revealRow(row, rowIndex, guess) {
                 cell.style.backgroundColor = 'green';
             }
             // Yellow condition
-            else if (yellowCase(cell, guess[colIndex], row)) {
+            else if (yellowCase(cell, guess[colIndex], row, guess)) {
+                if (!yellowLetters.includes(guess[colIndex]))
                 yellowLetters.push(guess[colIndex])
             }
             cell.style.transform = 'scale(1.2)';
@@ -118,14 +120,30 @@ function revealRow(row, rowIndex, guess) {
     }, 1100);
 }
 
-function yellowCase(cell, letter, row) {
+function yellowCase(cell, letter, row, guess) {
+    let letterCountInWord = 0;
+    let letterCountInGuess = 0;
+    // Count occurrences of letter in word and guess
     for (let i = 0; i < 5; i++) {
-        if (row.cells[i].getAttribute('data-letter') === letter && row.cells[i].textContent !== letter) {
-            return true;
+        if (row.cells[i].getAttribute('data-letter') === letter) {
+            letterCountInWord++;
+        }
+            if (guess[i] === letter) {
+                letterCountInGuess++;    
         }
     }
-    return false;
+    let correctPositionCount = 0;
+
+    // Count occurrences of letter in correct position
+    for (let i = 0; i < 5; i++) {
+        if (guess[i] === row.cells[i].getAttribute('data-letter') && guess[i] === letter) {
+            correctPositionCount++;
+        }
+    }
+
+    return letterCountInWord > correctPositionCount;
 }
+
 
 // UI keyboard
 document.querySelectorAll('.key').forEach(button => {
