@@ -18,12 +18,13 @@ function dailyWords(words) {
     const storedWords = JSON.parse(localStorage.getItem('dailyWords'));
 
     if (storedWords && storedWords.date === today) {            // If they've already been on the app, localStoage will be populated. Otherwise, get 5 random words
+        console.log(storedWords) // Remove when done
         populateTable(storedWords.words); 
     } else {
         const shuffled = words.sort(() => 0.5 - Math.random()); // Shuffle and take the first 5 words
         const selectedWords = shuffled.slice(0, 5); 
 
-        console.log(selectedWords)
+        console.log(selectedWords)  // Remove when done
 
         localStorage.setItem('dailyWords', JSON.stringify({ date: today, words: selectedWords }));
         
@@ -91,14 +92,19 @@ function submitGuess() {
 }
 
 function revealRow(row, rowIndex, guess) {
+    const yellowLetters = [];  // For each row
     for (let colIndex = 0; colIndex < 5; colIndex++) {
         const cell = row.cells[colIndex];
         
-        // Green condition
         setTimeout(() => {
+            // Green condition
             if (guess[colIndex] === cell.getAttribute('data-letter')) {
                 cell.textContent = guess[colIndex];
                 cell.style.backgroundColor = 'green';
+            }
+            // Yellow condition
+            else if (yellowCase(cell, guess[colIndex], row)) {
+                yellowLetters.push(guess[colIndex])
             }
             cell.style.transform = 'scale(1.2)';
             setTimeout(() => {
@@ -106,8 +112,20 @@ function revealRow(row, rowIndex, guess) {
             }, 200);
         }, colIndex * 200);
     }
+    setTimeout(() => {
+        const yellowCell = row.cells[5];
+        yellowCell.textContent = yellowLetters.join('');
+    }, 1100);
 }
 
+function yellowCase(cell, letter, row) {
+    for (let i = 0; i < 5; i++) {
+        if (row.cells[i].getAttribute('data-letter') === letter && row.cells[i].textContent !== letter) {
+            return true;
+        }
+    }
+    return false;
+}
 
 // UI keyboard
 document.querySelectorAll('.key').forEach(button => {
