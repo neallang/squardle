@@ -80,7 +80,7 @@ function handleKeyInput(letter) {
             errorMessage.textContent = "Guess must be 5 letters."
         }
     }
-    
+
     else if (currentGuess.length < 5 && letter.length === 1 && letter.match(/[A-Z]/)) {   // Added conditions to deal with 'BACKS' being added to guess when backspace pressed
         currentGuess += letter;
     }
@@ -133,6 +133,7 @@ function revealRow(row, rowIndex, guess) {
             }
         }
     }
+    console.log(letterMap);
 
     // Second pass: Handle yellow letters
     for (let colIndex = 0; colIndex < 5; colIndex++) {
@@ -140,9 +141,9 @@ function revealRow(row, rowIndex, guess) {
         const guessLetter = guess[colIndex];
         const letter = cell.getAttribute('data-letter');
 
-        if (guessLetter !== letter && letterMap[guessLetter] > 0 && !yellowLetters.includes(guessLetter)) {
+        if (letterMap[guessLetter] > 0 && !yellowLetters.includes(guessLetter)) {
             yellowLetters.push(guessLetter);
-            letterMap[guessLetter]--;
+            // letterMap[guessLetter]--;
         }
     }
 
