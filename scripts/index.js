@@ -3,6 +3,7 @@ let guessesRemaining = 15;
 let validWords = [];
 let yellowArrays = [[], [], [], [], []];    // Yellow letters for each word
 let letterMaps = [];                        // Letter count for each word
+const userGuesses = [];
 
 function getWords(callback) {
     fetch('utils/words.txt')
@@ -56,20 +57,30 @@ function handleKeyInput(letter) {
     else if (letter == "ENTER") {
         const errorMessage = document.getElementById("error-message");
 
-        // If valid guess, call submit. Otherwise, display relevant error message
         if (currentGuess.length === 5) {
             if (validWords.includes(currentGuess)) {
-                submitGuess(); 
-                errorMessage.textContent = "";
+                // Valid guess case
+                if (!userGuesses.includes(currentGuess)) {
+                    userGuesses.push(currentGuess)
+                    submitGuess(); 
+                    errorMessage.textContent = "";
+                }
+                // Duplicate guess case
+                else {
+                    errorMessage.textContent = "You've already guessed this word."
+                }
             }
+            // Invalid guess case
             else {
                 errorMessage.textContent = 'Not a valid word.';
             }
         } 
+        // < 5 letters guess case
         else {
             errorMessage.textContent = "Guess must be 5 letters."
         }
     }
+    
     else if (currentGuess.length < 5 && letter.length === 1 && letter.match(/[A-Z]/)) {   // Added conditions to deal with 'BACKS' being added to guess when backspace pressed
         currentGuess += letter;
     }
@@ -95,7 +106,6 @@ function submitGuess() {
     for (let rowIndex = 1; rowIndex < 6; rowIndex++) {
         const row = table.rows[rowIndex];
 
-        console.log(`Revealing row ${rowIndex}`);
         revealRow(row, rowIndex - 1, currentGuess);
     }
     currentGuess = "";
