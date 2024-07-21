@@ -121,7 +121,7 @@ function revealRow(row, rowIndex, guess) {
         const letter = cell.getAttribute('data-letter');
         const guessLetter = guess[colIndex];
 
-        if (guessLetter === letter) {
+        if (guessLetter === letter && cell.textContent === "") {
             cell.textContent = guessLetter;
             cell.style.backgroundColor = 'green';
             letterMap[letter]--;                   
