@@ -54,9 +54,21 @@ function handleKeyInput(letter) {
         currentGuess = currentGuess.slice(0, -1); // Remove last letter
     } 
     else if (letter == "ENTER") {
+        const errorMessage = document.getElementById("error-message");
+
+        // If valid guess, call submit. Otherwise, display relevant error message
         if (currentGuess.length === 5) {
-            submitGuess(); 
+            if (validWords.includes(currentGuess)) {
+                submitGuess(); 
+                errorMessage.textContent = "";
+            }
+            else {
+                errorMessage.textContent = 'Not a valid word.';
+            }
         } 
+        else {
+            errorMessage.textContent = "Guess must be 5 letters."
+        }
     }
     else if (currentGuess.length < 5 && letter.length === 1 && letter.match(/[A-Z]/)) {   // Added conditions to deal with 'BACKS' being added to guess when backspace pressed
         currentGuess += letter;
@@ -69,15 +81,6 @@ function handleKeyInput(letter) {
 }
 
 function submitGuess() {
-    const errorMessage = document.getElementById("error-message");
-
-    // Invalid word
-    if (!validWords.includes(currentGuess)) {
-        errorMessage.textContent = 'Not a valid word';
-        return;
-    }
-    errorMessage.textContent = ''
-
     guessesRemaining -= 1;
     document.getElementById('guesses-remaining').textContent = `${guessesRemaining} guesses`;
 
