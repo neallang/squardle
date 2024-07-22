@@ -4,6 +4,7 @@ let validWords = [];
 let yellowArrays = [[], [], [], [], []];    // Yellow letters for each word
 let letterMaps = [];                        // Letter count for each word
 const userGuesses = [];
+let gameOver = false;
 
 function getWords(callback) {
     fetch('utils/words.txt')
@@ -51,6 +52,8 @@ function populateTable(words) {
 }
 
 function handleKeyInput(letter) {
+    if (gameOver) return;
+
     if (letter === "DEL") {
         currentGuess = currentGuess.slice(0, -1); // Remove last letter
     } 
@@ -92,6 +95,8 @@ function handleKeyInput(letter) {
 }
 
 function submitGuess() {
+    if (gameOver) return;
+
     guessesRemaining -= 1;
     document.getElementById('guesses-remaining').textContent = `${guessesRemaining} guesses`;
 
@@ -162,12 +167,23 @@ function revealRow(row, rowIndex, guess) {
 }
 
 function gameWon(win) {
+    gameOver = true;
+
     if (win) {
         let attemptsUsed = 15 - currentGuess;
         alert(`Congratulations, you beat today's puzzle in ${attemptsUsed}`);
     }
     else {
         alert("Game over, you ran out of guesses! Try again tomorrow.");
+        const table = document.getElementById('game-table');
+        for (let rowIndex = 1; rowIndex < 6; rowIndex++) {
+            const row = table.rows[rowIndex];
+            for (colIndex = 0; colIndex < 5; colIndex++) {
+                const cell = row.cells[colIndex];
+                cell.textContent = cell.getAttribute('data-letter');
+            }
+        }
+
     }
 
     document.querySelectorAll('.key').forEach(button => {
