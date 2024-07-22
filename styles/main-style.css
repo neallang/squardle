@@ -67,3 +67,22 @@ td {
 .key.special-key {
     width: 90px;
 }
+
+#user-guesses {
+    text-align: center;
+    margin-top: 20px;
+    padding: 0 10px;
+}
+#guess-list {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;  /* Ensure the list items wrap on smaller screens */
+    max-width: 100%;  /* Ensure the list does not overflow the screen */
+    margin: 0 auto;
+}
+#guess-list li {
+    font-weight: bold;
+}

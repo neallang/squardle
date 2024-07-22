@@ -55,7 +55,8 @@ function handleKeyInput(letter) {
             if (validWords.includes(currentGuess)) {
                 // Valid guess case
                 if (!userGuesses.includes(currentGuess)) {
-                    userGuesses.push(currentGuess)
+                    userGuesses.push(currentGuess);
+                    updateUserGuesses();
                     submitGuess(); 
                     errorMessage.textContent = "";
                 }
@@ -205,6 +206,17 @@ function checkWin() {
         }
     }
     return true; // All cells green --> game over
+}
+
+function updateUserGuesses() {
+    const guessList = document.getElementById('guess-list');
+    guessList.innerHTML = ''; // Clear the existing list
+
+    userGuesses.forEach(guess => {
+        const listItem = document.createElement('li');
+        listItem.textContent = guess;
+        guessList.appendChild(listItem);
+    });
 }
 
 // UI keyboard
