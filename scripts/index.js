@@ -6,21 +6,6 @@ let letterMaps = [];                        // Letter count for each word
 const userGuesses = [];
 let gameOver = false;
 
-document.addEventListener('DOMContentLoaded', () => {
-    const tutorialModal = document.getElementById('tutorial-modal');
-    const startGameBtn = document.getElementById('start-game-btn');
-    const closeTutorialBtn = tutorialModal.querySelector('.close');
-
-    tutorialModal.style.display = "block";  // Initially show this modal
-
-    closeTutorialBtn.onclick = function() {
-        tutorialModal.style.display = "none";
-    }
-
-    startGameBtn.onclick = function() {
-        tutorialModal.style.display = "none";
-    }
-})
 
 function getWords(callback) {
     fetch('utils/words.txt')
@@ -34,22 +19,12 @@ function getWords(callback) {
 }
 
 function dailyWords(words) {
-    const today = new Date().toISOString().split('T')[0];  // YYYY-MM-DD 
-    const storedWords = JSON.parse(localStorage.getItem('dailyWords'));
+    const shuffled = words.sort(() => 0.5 - Math.random()); // Shuffle the words
+    const selectedWords = shuffled.slice(0, 5); // Take the first 5 words
 
-    if (storedWords && storedWords.date === today) {            // If they've already been on the app, localStoage will be populated. Otherwise, get 5 random words
-        console.log(storedWords) // Remove when done
-        populateTable(storedWords.words); 
-    } else {
-        const shuffled = words.sort(() => 0.5 - Math.random()); // Shuffle and take the first 5 words
-        const selectedWords = shuffled.slice(0, 5); 
+    console.log(selectedWords); // For debugging purposes
 
-        console.log(selectedWords)  // Remove when done
-
-        localStorage.setItem('dailyWords', JSON.stringify({ date: today, words: selectedWords }));
-        
-        populateTable(selectedWords);  
-    }
+    populateTable(selectedWords); // Populate the table with the selected words
 }
 
 function populateTable(words) {
@@ -191,10 +166,10 @@ function gameWon(win) {
 
     if (win) {
         let attemptsUsed = 15 - guessesRemaining;
-        modalMessage.textContent = `Congratulations, you beat today's puzzle in ${attemptsUsed} attempts!`;
+        modalMessage.textContent = `Congratulations, you beat this puzzle in ${attemptsUsed} attempts! Refresh the page to play again.`;
     }
     else {
-        modalMessage.textContent = "Game over, you ran out of guesses! Try again tomorrow.";
+        modalMessage.textContent = "Game over, you ran out of guesses! Refresh the page to try again.";
 
         const table = document.getElementById('game-table');
         for (let rowIndex = 1; rowIndex < 6; rowIndex++) {
@@ -256,4 +231,22 @@ function handleKeyDown () {
 document.addEventListener('keydown', handleKeyDown);
 
 // Initialize
-getWords(dailyWords);
+
+document.addEventListener('DOMContentLoaded', () => {
+    getWords(dailyWords);
+    
+    const tutorialModal = document.getElementById('tutorial-modal');
+    const startGameBtn = document.getElementById('start-game-btn');
+    const closeTutorialBtn = tutorialModal.querySelector('.close');
+
+    tutorialModal.style.display = "block";  // Initially show this modal
+
+    closeTutorialBtn.onclick = function() {
+        tutorialModal.style.display = "none";
+    }
+
+    startGameBtn.onclick = function() {
+        tutorialModal.style.display = "none";
+    }
+})
+
