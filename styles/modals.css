@@ -24,8 +24,24 @@
     text-align: center;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
     border-radius: 15px;
-    font-weight: bold;
+    /* font-weight: bold; */
     position: relative;
+}
+
+.modal-content p {
+    margin: 2% 10%;
+}
+
+#start-game-btn {
+    width: 100px;
+    height: 35px;
+    margin: 20px auto;
+    border-radius: 2px transparent;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
+}
+
+#end-message {
+    font-weight: bold;
 }
 
 .close {
@@ -42,4 +58,10 @@
     color: black;
     text-decoration: none;
     cursor: pointer;
+}
+
+.tut-img {
+    width: 60%;
+    height: auto;
+    margin: auto;
 }

@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Squardle</title>
     <link rel="stylesheet" href="styles/main-style.css">
-    <link rel="stylesheet" href="styles/alerts.css">
+    <link rel="stylesheet" href="styles/modals.css">
   </head>
   <body>
     <div class="container">
@@ -74,11 +74,27 @@
     </div>
 	<script src="scripts/index.js"></script>
 
-    <!-- Modal Structure -->
+    <!-- Tutorial Modal -->
+  <div id="tutorial-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h1>Getting Started</h1>
+        <p>Welcome to Squardle, a 2-D Wordle game!</p>
+        <p>You have 15 guesses to find all 5 hidden words. Guesses are submitted in the top row. In the example below, 'STARE' would be the first guess.</p>
+        <img class="tut-img" src="assets/images/squardle-1.png">
+
+        <p>Words are displayed in each row. In the example below, 'C' and 'R' have been guessed in the correct position. 'E', however, is in the word but its correct position has not been found.</p>
+        <img class="tut-img" src="assets/images/squardle-2.png">
+        <!-- Add more instructional content here -->
+        <button id="start-game-btn">Start Game</button>
+    </div>
+  </div>
+
+    <!-- Win / Lose Modal -->
   <div id="game-modal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
-        <p id="modal-message"></p>
+        <p id="end-message"></p>
     </div>
   </div>
 

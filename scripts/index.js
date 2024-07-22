@@ -6,6 +6,22 @@ let letterMaps = [];                        // Letter count for each word
 const userGuesses = [];
 let gameOver = false;
 
+document.addEventListener('DOMContentLoaded', () => {
+    const tutorialModal = document.getElementById('tutorial-modal');
+    const startGameBtn = document.getElementById('start-game-btn');
+    const closeTutorialBtn = tutorialModal.querySelector('.close');
+
+    tutorialModal.style.display = "block";  // Initially show this modal
+
+    closeTutorialBtn.onclick = function() {
+        tutorialModal.style.display = "none";
+    }
+
+    startGameBtn.onclick = function() {
+        tutorialModal.style.display = "none";
+    }
+})
+
 function getWords(callback) {
     fetch('utils/words.txt')
         .then(response => response.text())
@@ -170,11 +186,11 @@ function gameWon(win) {
     gameOver = true;
 
     const modal = document.getElementById('game-modal');
-    const modalMessage = document.getElementById('modal-message');
-    const closeBtn = document.querySelector('.close');
+    const modalMessage = document.getElementById('end-message');
+    const closeBtn = modal.querySelector('.close');
 
     if (win) {
-        let attemptsUsed = 15 - currentGuess;
+        let attemptsUsed = 15 - guessesRemaining;
         modalMessage.textContent = `Congratulations, you beat today's puzzle in ${attemptsUsed} attempts!`;
     }
     else {
