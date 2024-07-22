@@ -1,0 +1,45 @@
+.modal {
+    display: none;          /* Hidden by default */
+    position: fixed; 
+    z-index: 1;             /* Come above the board */
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto;         /* Scroll if needed */
+    background-color: rgba(0,0,0,0.4); /* Grey out the original page */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 5px;
+    border: 1px solid #888;
+    width: 30%; 
+    min-height: 30%; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
+    border-radius: 15px;
+    font-weight: bold;
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    color: red;
+    float: right;
+    font-size: 40px;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}

@@ -169,12 +169,17 @@ function revealRow(row, rowIndex, guess) {
 function gameWon(win) {
     gameOver = true;
 
+    const modal = document.getElementById('game-modal');
+    const modalMessage = document.getElementById('modal-message');
+    const closeBtn = document.querySelector('.close');
+
     if (win) {
         let attemptsUsed = 15 - currentGuess;
-        alert(`Congratulations, you beat today's puzzle in ${attemptsUsed}`);
+        modalMessage.textContent = `Congratulations, you beat today's puzzle in ${attemptsUsed} attempts!`;
     }
     else {
-        alert("Game over, you ran out of guesses! Try again tomorrow.");
+        modalMessage.textContent = "Game over, you ran out of guesses! Try again tomorrow.";
+
         const table = document.getElementById('game-table');
         for (let rowIndex = 1; rowIndex < 6; rowIndex++) {
             const row = table.rows[rowIndex];
@@ -183,7 +188,12 @@ function gameWon(win) {
                 cell.textContent = cell.getAttribute('data-letter');
             }
         }
+    }
 
+    modal.style.display = "block";
+
+    closeBtn.onclick = function() {
+        modal.style.display = "none";
     }
 
     document.querySelectorAll('.key').forEach(button => {
