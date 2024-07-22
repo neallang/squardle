@@ -162,15 +162,12 @@ function revealRow(row, rowIndex, guess) {
 }
 
 function gameWon(win) {
-    const message = "";
     if (win) {
         let attemptsUsed = 15 - currentGuess;
-        message = `Congratulations, you beat today's puzzle in ${attemptsUsed}`;
-        alert(message);
+        alert(`Congratulations, you beat today's puzzle in ${attemptsUsed}`);
     }
     else {
-        message = "Game over, you ran out of guesses! Try again tomorrow.";
-        alert(message);
+        alert("Game over, you ran out of guesses! Try again tomorrow.");
     }
 
     document.querySelectorAll('.key').forEach(button => {
