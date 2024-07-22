@@ -109,6 +109,16 @@ function submitGuess() {
         revealRow(row, rowIndex - 1, currentGuess);
     }
     currentGuess = "";
+
+    if (checkWin()) {
+        gameWon(true);
+        return;
+    }
+
+    if (guessesRemaining === 0) {
+        gameWon(false);
+        return;
+    }
 }
 
 function revealRow(row, rowIndex, guess) {
@@ -151,6 +161,38 @@ function revealRow(row, rowIndex, guess) {
     yellowCell.textContent = yellowLetters.join('');
 }
 
+function gameWon(win) {
+    const message = "";
+    if (win) {
+        let attemptsUsed = 15 - currentGuess;
+        message = `Congratulations, you beat today's puzzle in ${attemptsUsed}`;
+        alert(message);
+    }
+    else {
+        message = "Game over, you ran out of guesses! Try again tomorrow.";
+        alert(message);
+    }
+
+    document.querySelectorAll('.key').forEach(button => {
+        button.disabled = true;
+    });
+    document.removeEventListener('keydown', handleKeyDown);
+}
+
+function checkWin() {
+    const table = document.getElementById('game-table');
+    for (let rowIndex = 1; rowIndex < 6; rowIndex++) {
+        const row = table.rows[rowIndex];
+        for (colIndex = 0; colIndex < 5; colIndex++) {
+            const cell = row.cells[colIndex];
+            if (cell.style.backgroundColor !== 'green') {
+                return false;
+            }
+        }
+    }
+    return true; // All cells green --> game over
+}
+
 // UI keyboard
 document.querySelectorAll('.key').forEach(button => {
     button.addEventListener('click', () => {
@@ -160,7 +202,7 @@ document.querySelectorAll('.key').forEach(button => {
 });
 
 // Physical keyboard
-document.addEventListener('keydown', (event) => {
+function handleKeyDown () {
     const key = event.key.toUpperCase();
 
     if (key === "BACKSPACE") {
@@ -170,7 +212,9 @@ document.addEventListener('keydown', (event) => {
     } else if (key >= 'A' && key <= 'Z') {
         handleKeyInput(key);
     }
-});
+}
+
+document.addEventListener('keydown', handleKeyDown);
 
 // Initialize
 getWords(dailyWords);
