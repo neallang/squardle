@@ -5,9 +5,9 @@ let yellowArrays = [[], [], [], [], []];    // Yellow letters for each word
 let letterMaps = [];                        // Letter count for each word
 const userGuesses = [];
 let gameOver = false;
-let animationFinished = false;
+let animationFinished = false;              // To deal with setTimeout issues
 
-
+// Function to get the list of words from the txt file.
 function getWords(callback) {
     fetch('utils/words.txt')
         .then(response => response.text())
@@ -19,15 +19,15 @@ function getWords(callback) {
         .catch(error => console.error('Error fetching word list:'))
 }
 
+// Function to get the 5 words for this round.
 function dailyWords(words) {
     const shuffled = words.sort(() => 0.5 - Math.random()); // Shuffle the words
     const selectedWords = shuffled.slice(0, 5); // Take the first 5 words
 
-    console.log(selectedWords); // For debugging purposes
-
     populateTable(selectedWords); // Populate the table with the selected words
 }
 
+// Function to initialize the game and setup the table.
 function populateTable(words) {
     const table = document.getElementById('game-table');
     words.forEach((word, rowIndex) => {
@@ -43,6 +43,7 @@ function populateTable(words) {
     });
 }
 
+// Function to handle key input, whether it be from physical keyboard or on-screen keyboard.
 function handleKeyInput(letter) {
     if (gameOver) return;
 
@@ -77,16 +78,19 @@ function handleKeyInput(letter) {
         }
     }
 
+    // Build the current guess
     else if (currentGuess.length < 5 && letter.length === 1 && letter.match(/[A-Z]/)) {   // Added conditions to deal with 'BACKS' being added to guess when backspace pressed
         currentGuess += letter;
     }
 
+    // Display the current guess
     const firstRow = document.getElementById('guess-row');
     for (let i = 0; i < 5; i++) {
         firstRow.cells[i].textContent = currentGuess[i] || ''
     }
 }
 
+// Function called after submitting each guess. Calls logic function and checks if a user has won / lost.
 function submitGuess() {
     if (gameOver) return;
 
@@ -122,17 +126,9 @@ function submitGuess() {
 
     currentGuess = "";
 
-    // if (checkWin()) {
-    //     gameWon(true);
-    //     return;
-    // }
-
-    // if (guessesRemaining === 0) {
-    //     gameWon(false);
-    //     return;
-    // }
 }
 
+// Function that handles the logic of the game.
 function revealRow(row, rowIndex, guess) {
     const yellowLetters = yellowArrays[rowIndex];  // Use the array for the word
     let letterMap = letterMaps[rowIndex];          // Get the letter map for the word
@@ -173,7 +169,6 @@ function revealRow(row, rowIndex, guess) {
 
             if (letterMap[guessLetter] > 0 && !yellowLetters.includes(guessLetter)) {
                 yellowLetters.push(guessLetter);
-                // letterMap[guessLetter]--;
             }
         }
 
@@ -183,6 +178,7 @@ function revealRow(row, rowIndex, guess) {
     }, 1000);  // Delay to show yellow letters after the trickling effect
 }
 
+// Function that is called once the game is won / lost.
 function gameWon(win) {
     gameOver = true;
 
@@ -207,6 +203,7 @@ function gameWon(win) {
         }
     }
 
+    // Display the modal once the game is over.
     modal.style.display = "block";
 
     closeBtn.onclick = function() {
@@ -219,6 +216,7 @@ function gameWon(win) {
     document.removeEventListener('keydown', handleKeyDown);
 }
 
+// Function that handles the logic of checking if a user has won. This function is called after each guess.
 function checkWin() {
     const table = document.getElementById('game-table');
     for (let rowIndex = 1; rowIndex < 6; rowIndex++) {
@@ -233,6 +231,7 @@ function checkWin() {
     return true; // All cells green --> game over
 }
 
+// Function to display the user's previous guesses. They cannot submit duplicate guesses.
 function updateUserGuesses() {
     const guessList = document.getElementById('guess-list');
     guessList.innerHTML = ''; // Clear the existing list
@@ -244,7 +243,7 @@ function updateUserGuesses() {
     });
 }
 
-// UI keyboard
+// On-screen keyboard
 document.querySelectorAll('.key').forEach(button => {
     button.addEventListener('click', () => {
         const letter = button.textContent;
@@ -265,10 +264,10 @@ function handleKeyDown () {
     }
 }
 
+// Call the function above when a user presses a key
 document.addEventListener('keydown', handleKeyDown);
 
-// Initialize
-
+// Initialize the game and show the getting started instructions
 document.addEventListener('DOMContentLoaded', () => {
     getWords(dailyWords);
     

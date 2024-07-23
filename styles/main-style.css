@@ -29,7 +29,7 @@ td {
     background-color: white;
 }
 
-/* use # to grab from id rather than class */
+/* Use # to grab from id rather than class */
 #guess-row td {
     background-color: #85d3e9;
 }
