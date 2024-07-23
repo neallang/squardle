@@ -5,6 +5,7 @@ let yellowArrays = [[], [], [], [], []];    // Yellow letters for each word
 let letterMaps = [];                        // Letter count for each word
 const userGuesses = [];
 let gameOver = false;
+let animationFinished = false;
 
 
 function getWords(callback) {
@@ -105,17 +106,31 @@ function submitGuess() {
 
         revealRow(row, rowIndex - 1, currentGuess);
     }
+
+    setTimeout(() => { 
+        if (animationFinished) { // Check the flag
+            if (checkWin()) {
+                gameWon(true);
+                return;
+            }
+            if (guessesRemaining === 0) {
+                gameWon(false);
+                return;
+            }
+        }
+    }, 1000); 
+
     currentGuess = "";
 
-    if (checkWin()) {
-        gameWon(true);
-        return;
-    }
+    // if (checkWin()) {
+    //     gameWon(true);
+    //     return;
+    // }
 
-    if (guessesRemaining === 0) {
-        gameWon(false);
-        return;
-    }
+    // if (guessesRemaining === 0) {
+    //     gameWon(false);
+    //     return;
+    // }
 }
 
 function revealRow(row, rowIndex, guess) {
@@ -128,34 +143,44 @@ function revealRow(row, rowIndex, guess) {
         const letter = cell.getAttribute('data-letter');
         const guessLetter = guess[colIndex];
 
-        if (guessLetter === letter && cell.textContent === "") {
-            cell.textContent = guessLetter;
-            cell.style.backgroundColor = 'green';
-            letterMap[letter]--;                   
+        setTimeout(() => {
+            if (guessLetter === letter && cell.textContent === "") {
+                cell.textContent = guessLetter;
+                cell.style.backgroundColor = 'green';
+                letterMap[letter]--;                   
 
-            // Remove the letter from yellow letters if it's correctly guessed
-            const yellowIndex = yellowLetters.indexOf(guessLetter);
-            if (yellowIndex > -1) {
-                yellowLetters.splice(yellowIndex, 1);
+                // Remove the letter from yellow letters if it's correctly guessed
+                const yellowIndex = yellowLetters.indexOf(guessLetter);
+                if (yellowIndex > -1) {
+                    yellowLetters.splice(yellowIndex, 1);
+                }
             }
-        }
+
+            // Animation effect
+            cell.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                cell.style.transform = 'scale(1)';
+            }, 200);
+        }, colIndex * 200);
     }
-    console.log(letterMap);
 
     // Second pass: Handle yellow letters
-    for (let colIndex = 0; colIndex < 5; colIndex++) {
-        const cell = row.cells[colIndex];
-        const guessLetter = guess[colIndex];
-        const letter = cell.getAttribute('data-letter');
+    setTimeout(() => {
+        for (let colIndex = 0; colIndex < 5; colIndex++) {
+            const cell = row.cells[colIndex];
+            const guessLetter = guess[colIndex];
+            const letter = cell.getAttribute('data-letter');
 
-        if (letterMap[guessLetter] > 0 && !yellowLetters.includes(guessLetter)) {
-            yellowLetters.push(guessLetter);
-            // letterMap[guessLetter]--;
+            if (letterMap[guessLetter] > 0 && !yellowLetters.includes(guessLetter)) {
+                yellowLetters.push(guessLetter);
+                // letterMap[guessLetter]--;
+            }
         }
-    }
 
-    const yellowCell = row.cells[5];                // The last cell for yellow letters
-    yellowCell.textContent = yellowLetters.join('');
+        const yellowCell = row.cells[5];  // The last cell for yellow letters
+        yellowCell.textContent = yellowLetters.join('');
+        animationFinished = true;
+    }, 1000);  // Delay to show yellow letters after the trickling effect
 }
 
 function gameWon(win) {
